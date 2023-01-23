@@ -9,9 +9,11 @@ int main(){
 
     fd = wiringPiI2CSetup(0x1d);
 
-    std::cout << fd << endl;
+    std::cout << fd << std::endl;
 
     while(1){
         std::cout << wiringPiI2CRead(fd) << std::endl;
     }
 }
+
+//g++ read_imu.cpp -l wiringPi -o i2ctest
