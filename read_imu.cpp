@@ -15,7 +15,7 @@ int main(){
     while(j){
         std::cout << wiringPiI2CRead(fd) << std::endl;
 
-        std::in >> j;
+        std::cin >> j;
     }
 }
 
