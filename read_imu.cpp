@@ -11,7 +11,7 @@ int main(){
 
     std::cout << fd << std::endl;
     
-    int j = 1
+    int j = 1;
     while(j){
         std::cout << wiringPiI2CRead(fd) << std::endl;
 
