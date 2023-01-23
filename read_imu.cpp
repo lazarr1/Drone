@@ -11,11 +11,17 @@ int main(){
 
     std::cout << fd << std::endl;
     
-    int j = 1;
+    int j = 99999999;
     while(j){
         std::cout << wiringPiI2CRead(fd) << std::endl;
 
-        std::cin >> j;
+
+
+        if(j == 1)
+            j = 9999999;
+            std::cin >> j;
+
+        j--;
     }
 }
 
