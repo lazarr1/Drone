@@ -2,29 +2,47 @@ import sys
 import board
 import busio
 
+import smbus
+import time
 
-i2c = busio.I2C(board.SCL, board.SDA)
+addr = 0x1d
 
+bus = smbus.SMBus(1)
 
-print("Scan : " , [hex(i) for i in i2c.scan()])
-
-MMAB452Q = 0x1d
-
-if not MMAB452Q in i2c.scan():
-    print("could not find imu")
-    sys.exit()
+numb = 1
 
 
-def get_MMAB452Q_id():
-
-    # for i in range(0xFF):
+bus.write_byte(addr, 0xFF)
 
 
-        i2c.writeto(MMAB452Q,  bytes([0xFF]), stop = False) 
-        result = bytearray(1)
-        i2c.readfrom_into(MMAB452Q, result)
+for i in range(1,20):
+    value= bus.read_byte(addr)
 
-        print("ID: ", int.from_bytes(result, "big"))
+    print(value)
+    time.sleep(1)
 
 
-get_MMAB452Q_id()
+    
+
+
+
+# i2c = busio.I2C(board.SCL, board.SDA)
+
+
+# print("Scan : " , [hex(i) for i in i2c.scan()])
+
+# MMAB452Q = 0x1d
+
+# if not MMAB452Q in i2c.scan():
+#     print("could not find imu")
+#     sys.exit()
+
+
+# def get_MMAB452Q_id():
+#     i2c.writeto(MMAB452Q,  bytes([0x0D]), stop = False) 
+#     result = bytearray(1)
+#     i2c.readfrom_into(MMAB452Q, result)
+
+#     print("ID: ", int.from_bytes(result, "big"))
+
+# get_MMAB452Q_id()
