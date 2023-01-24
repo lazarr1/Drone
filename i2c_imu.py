@@ -22,10 +22,10 @@ def get_MMAB452Q_id():
         hex_int = int(hex(i), 16)
         new_int = hex_int + 0x200
 
-        i2c.writeto(MMAB452Q,  bytes([hex_int]), stop = False) 
+        i2c.writeto(MMAB452Q,  bytes([new_int]), stop = False) 
         result = bytearray(1)
         i2c.readfrom_into(MMAB452Q, result)
 
-        print("ID: ", int.from_bytes(result))
+        print("ID: ", int.from_bytes(result, "big"))
 
 get_MMAB452Q_id()
