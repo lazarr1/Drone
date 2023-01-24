@@ -234,4 +234,4 @@ byte MMA8452Q::readRegister(MMA8452Q_Register reg)
 }
 
 
-//g++ read_imu.cpp -l wiringPi -o read
+//g++ read_imu.cpp -l wiringPi -o read.o
