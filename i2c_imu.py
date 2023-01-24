@@ -17,14 +17,14 @@ if not MMAB452Q in i2c.scan():
 
 def get_MMAB452Q_id():
 
-    for i in range(49):
+    for i in range(255):
 
-        hex_int = int(hex(i), base=16)
+        # hex_int = int(hex(i), base=16)
         # new_int = hex_int + 0x200
 
-        print(hex_int)
+        # print(hex_int)
 
-        i2c.writeto(MMAB452Q,  bytes([hex_int]), stop = False) 
+        i2c.writeto(MMAB452Q,  bytes([i]), stop = False) 
         result = bytearray(1)
         i2c.readfrom_into(MMAB452Q, result)
 
