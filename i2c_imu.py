@@ -26,6 +26,6 @@ def get_MMAB452Q_id():
         result = bytearray(1)
         i2c.readfrom_into(MMAB452Q, result)
 
-    print("ID: ", int.from_bytes(result, "big"))
+        print("ID: ", int.from_bytes(result, "big"))
 
 get_MMAB452Q_id()
