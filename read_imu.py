@@ -113,8 +113,8 @@ class MMA8452Q:
 
 
     def readRegistersInto(self, reg, output, length):
-        for i in enumerate(range(reg, reg+length)):
-            output[i[0]] = self.readRegister(i[1])
+        for i in range(length):
+            output[i] = self.readRegister(reg.value + i)
 
     def readRegister(self, reg: bytes) -> bytes:
         res = bytearray([reg])
@@ -172,4 +172,4 @@ if __name__ == "__main__":
     imu = MMA8452Q()
 
     while 1:
-        MMA8452Q.read()
+        imu.read()
