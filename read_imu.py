@@ -81,7 +81,7 @@ class MMA8452Q:
         else:
             self.i2c = bus
 
-        result = bytearray([MMA8452Q_Registers.WHO_AM_I])
+        result = bytearray([MMA8452Q_Registers.WHO_AM_I.value])
         self.i2c.writeto_then_readfrom(self.addr, result, result)
 
         if result[0] != 0x2A:
@@ -116,8 +116,8 @@ class MMA8452Q:
         for i in range(length):
             output[i] = self.readRegister(reg.value + i)
 
-    def readRegister(self, reg: bytes) -> bytes:
-        res = bytearray([reg])
+    def readRegister(self, reg) -> bytes:
+        res = bytearray([reg.value])
         self.i2c.writeto_then_readfrom(self.addr, res, res)
 
         while not self.__available():
@@ -170,6 +170,7 @@ class MMA8452Q:
 
 if __name__ == "__main__":
     imu = MMA8452Q()
-
+    imu.init()
     while 1:
-        imu.read()
+        #imu.read()
+        time.sleep(0.1)
