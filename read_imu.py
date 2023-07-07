@@ -89,8 +89,8 @@ class MMA8452Q:
             return 0
 
         self.standby()
-        self.__setScale()
-        self.__setOdr()
+        self.__setScale(scale)
+        self.__setOdr(odr)
         self.active()
 
         return 1
@@ -114,14 +114,17 @@ class MMA8452Q:
 
     def readRegistersInto(self, reg, output, length):
         for i in range(length):
-            output[i] = self.readRegister(reg.value + i)
+            output[i] = self.readRawRegister(reg.value + i)
+
+    def readRawRegister(self, reg):
+        res = bytearray([reg])
+        self.i2c.writeto_then_readfrom(self.addr, res, res)
+        return res[0]
 
     def readRegister(self, reg) -> bytes:
         res = bytearray([reg.value])
         self.i2c.writeto_then_readfrom(self.addr, res, res)
 
-        while not self.__available():
-            pass
 
         return res[0]
 
@@ -129,7 +132,7 @@ class MMA8452Q:
     # This function checks the status of the MMA8452Q
     # to see if new data is availble.
     # returns 0 if no new data is present, or a 1 if new data is available.
-    def __available(self) -> int:
+    def __available(self):
         return (self.readRegister(MMA8452Q_Registers.STATUS) & 0x08) >> 3
 
     # Set IMU to standby mode to change register settings
@@ -137,40 +140,40 @@ class MMA8452Q:
         c = self.readRegister(MMA8452Q_Registers.CTRL_REG1)
 
         # clear only the standby bit
-        self.i2c.writeto(self.addr, MMA8452Q_Registers.CTRL_REG1, c & ~ (0x01))
+        self.i2c.writeto(self.addr, bytearray([MMA8452Q_Registers.CTRL_REG1.value]))
 
     def active(self) -> None:
         c = self.readRegister(MMA8452Q_Registers.CTRL_REG1)
 
         # set only the standby bit
-        self.i2c.writeto(self.addr, MMA8452Q_Registers.CTRL_REG1, c | ~ (0x01))
+        self.i2c.writeto(self.addr, bytearray([MMA8452Q_Registers.CTRL_REG1.value, c | (~ (0x01) & 0xFF)]))
 
     # SET THE OUTPUT DATA RATE
     # This function sets the output data rate of the MMA8452Q.
     # Possible values for the odr parameter are: ODR_800, ODR_400, ODR_200,
     # ODR_100, ODR_50, ODR_12, ODR_6, or ODR_1
-    def __setODR(self, odr: MMA8452Q_ODR) -> None:
-        self.odr = odr
+    def __setOdr(self, odr: MMA8452Q_ODR) -> None:
+        self.odr = odr.value
 
         ctrl_1 = self.readRegister(MMA8452Q_Registers.CTRL_REG1)
 
         ctrl_1 &= 0xCF  # mask out data rate bits
-        ctrl_1 |= (odr << 3)
+        ctrl_1 |= (self.odr << 3)
 
-        self.i2c.writeto(self.addr, MMA8452Q_Registers.CTRL_REG1, ctrl_1)
+        self.i2c.writeto(self.addr, bytearray([MMA8452Q_Registers.CTRL_REG1.value, ctrl_1]))
 
     def __setScale(self, scale: MMA8452Q_Scale):
-
+        self.scale = scale.value
         cfg = self.readRegister(MMA8452Q_Registers.XYZ_DATA_CFG)
         cfg &= 0xFC  # mask out scale bits
-        cfg |= (scale >> 2)
+        cfg |= (self.scale >> 2)
 
-        self.i2c.writeto(self.addr, MMA8452Q_Registers.XYZ_DATA_CFG, cfg)
+        self.i2c.writeto(self.addr, bytearray([MMA8452Q_Registers.XYZ_DATA_CFG.value, cfg]))
 
 
 if __name__ == "__main__":
     imu = MMA8452Q()
     imu.init()
     while 1:
-        #imu.read()
-        time.sleep(0.1)
+        imu.read()
+        time.sleep(0.5)
