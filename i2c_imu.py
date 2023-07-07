@@ -1,15 +1,13 @@
 import sys
 import board
 import busio
-
+import time
 import smbus
 
 addr = 0x1d
-bus = smbus.SMBus(1)
-bus.write_byte(addr, 0xFF)
-
 
 i2c = busio.I2C(board.SCL, board.SDA)
+i2c.init(board.SCL, board.SDA, frequency = 400000)
 
 print("Scan : ", [hex(i) for i in i2c.scan()])
 
@@ -21,11 +19,18 @@ if MMAB452Q not in i2c.scan():
 
 
 def get_MMAB452Q_id():
-    i2c.writeto(MMAB452Q, bytes([0x0E]), stop=False)
-    result = bytearray(1)
-    i2c.readfrom_into(MMAB452Q, result)
-    print(result)
-    print("ID: ", int.from_bytes(result, "big"))
-
+    result = bytearray([0x0D])
+    i2c.writeto_then_readfrom(addr,result,result); 
+    return result
 
 get_MMAB452Q_id()
+
+result = bytearray([0x2A, 0x2A | 0x01])
+i2c.writeto(addr,result); 
+
+while(1):
+    result = bytearray([0x04])
+    i2c.writeto_then_readfrom(addr,result,result); 
+
+    print(hex(result[0]))
+    time.sleep(0.1)
