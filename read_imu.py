@@ -111,7 +111,6 @@ class MMA8452Q:
         print([cx, cy, cz])
         return [cx, cy, cz]
 
-
     def readRegistersInto(self, reg, output, length):
         for i in range(length):
             output[i] = self.readRawRegister(reg.value + i)
@@ -124,8 +123,6 @@ class MMA8452Q:
     def readRegister(self, reg) -> bytes:
         res = bytearray([reg.value])
         self.i2c.writeto_then_readfrom(self.addr, res, res)
-
-
         return res[0]
 
     # CHECK IF NEW DATA IS AVAILABLE
@@ -140,13 +137,13 @@ class MMA8452Q:
         c = self.readRegister(MMA8452Q_Registers.CTRL_REG1)
 
         # clear only the standby bit
-        self.i2c.writeto(self.addr, bytearray([MMA8452Q_Registers.CTRL_REG1.value]))
+        self.i2c.writeto(self.addr, bytearray([MMA8452Q_Registers.CTRL_REG1.value, c | (~ (0x01) & 0xFF)]))
 
     def active(self) -> None:
         c = self.readRegister(MMA8452Q_Registers.CTRL_REG1)
 
         # set only the standby bit
-        self.i2c.writeto(self.addr, bytearray([MMA8452Q_Registers.CTRL_REG1.value, c | (~ (0x01) & 0xFF)]))
+        self.i2c.writeto(self.addr, bytearray([MMA8452Q_Registers.CTRL_REG1.value, c | (0x01)]))
 
     # SET THE OUTPUT DATA RATE
     # This function sets the output data rate of the MMA8452Q.
