@@ -6,12 +6,7 @@ import smbus
 import time
 
 addr = 0x1d
-
 bus = smbus.SMBus(1)
-
-numb = 1
-
-
 bus.write_byte(addr, 0xFF)
 
 
@@ -38,7 +33,7 @@ def get_MMAB452Q_id():
     i2c.writeto(MMAB452Q, bytes([0x0D]), stop=False)
     result = bytearray(1)
     i2c.readfrom_into(MMAB452Q, result)
-
+    print(result)
     print("ID: ", int.from_bytes(result, "big"))
 
 
