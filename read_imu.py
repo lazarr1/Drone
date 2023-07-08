@@ -1,4 +1,3 @@
-import sys
 import board
 import busio
 import time
@@ -72,8 +71,8 @@ class MMA8452Q:
     def __init__(self):
         self.addr = 0x1d
 
-    def init(self, scale: int = MMA8452Q_Scale.SCALE_2G,
-             odr: int = MMA8452Q_ODR.ODR_800, bus: busio.I2C = None) -> int:
+    def init(self, scale: MMA8452Q_Scale = MMA8452Q_Scale.SCALE_2G,
+             odr: MMA8452Q_ODR = MMA8452Q_ODR.ODR_800, bus: busio.I2C = None) -> int:
 
         if bus is None:
             self.i2c = busio.I2C(board.SCL, board.SDA)
@@ -95,7 +94,7 @@ class MMA8452Q:
 
         return 1
 
-    def read(self):
+    def read(self) -> list[float]:
         rawData = bytearray(6)
 
         self.readRegistersInto(MMA8452Q_Registers.OUT_X_MSB, rawData, 6)
@@ -111,16 +110,17 @@ class MMA8452Q:
         print([cx, cy, cz])
         return [cx, cy, cz]
 
-    def readRegistersInto(self, reg, output, length):
+    def readRegistersInto(self, reg: MMA8452Q_Registers,
+                          output: bytearray, length: int) -> None:
         for i in range(length):
             output[i] = self.readRawRegister(reg.value + i)
 
-    def readRawRegister(self, reg):
+    def readRawRegister(self, reg: MMA8452Q_Registers) -> bytes:
         res = bytearray([reg])
         self.i2c.writeto_then_readfrom(self.addr, res, res)
         return res[0]
 
-    def readRegister(self, reg) -> bytes:
+    def readRegister(self, reg: MMA8452Q_Registers) -> bytes:
         res = bytearray([reg.value])
         self.i2c.writeto_then_readfrom(self.addr, res, res)
         return res[0]
@@ -129,7 +129,7 @@ class MMA8452Q:
     # This function checks the status of the MMA8452Q
     # to see if new data is availble.
     # returns 0 if no new data is present, or a 1 if new data is available.
-    def __available(self):
+    def __available(self) -> bool:
         return (self.readRegister(MMA8452Q_Registers.STATUS) & 0x08) >> 3
 
     # Set IMU to standby mode to change register settings
@@ -159,7 +159,7 @@ class MMA8452Q:
 
         self.i2c.writeto(self.addr, bytearray([MMA8452Q_Registers.CTRL_REG1.value, ctrl_1]))
 
-    def __setScale(self, scale: MMA8452Q_Scale):
+    def __setScale(self, scale: MMA8452Q_Scale) -> None:
         self.scale = scale.value
         cfg = self.readRegister(MMA8452Q_Registers.XYZ_DATA_CFG)
         cfg &= 0xFC  # mask out scale bits
